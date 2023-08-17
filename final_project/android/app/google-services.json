@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "398220662642",
+    "firebase_url": "https://iot-training-final-project-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "iot-training-final-project",
+    "storage_bucket": "iot-training-final-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398220662642:android:aa1153b92f5aa303082feb",
+        "android_client_info": {
+          "package_name": "com.example.final_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398220662642-io6a1lpq24marka72h9229hf0gq06amq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFtgk-FysXe3GTWVwTRvGILe9bBxRO8-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398220662642-io6a1lpq24marka72h9229hf0gq06amq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
