@@ -1,9 +1,7 @@
-import 'dart:html';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'firebase_options.dart';
 
 void main() async {
@@ -26,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 4, 217, 114)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Homa Alone Security System'),
+      home: const MyHomePage(title: 'Home Alone Security System'),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -34,16 +32,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -51,8 +39,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  void _incrementCounter() {setState(() {_counter++;});}
+  List<String> rooms = ["Entrance: On", "Room 1: On", "Room 2: On", "Ladder: On"];
+  void controlRoom(int room_num) {
+    bool isOn = false;
+    String room_name = rooms[room_num];
+    if (room_name[room_name.length - 1] == "n") isOn = true;
+    else if (room_name[room_name.length - 1] == "f") isOn = false;
+
+    setState(() {
+      if (isOn) rooms[room_num] = "Entrance: Off";
+      else rooms[room_num] = "Entrance: On";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +59,16 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Column( 
+      body: Center(child: Column( 
         children: <Widget>[
-          Text("$_counter"),
-          Expanded(
+          const Text(
+            "The readings",
+            style: TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold
+            ),//text color
+          ),
+          if (kIsWeb) Expanded(
             child: GridView.count(
               primary: true,
               padding: const EdgeInsets.all(20),
@@ -79,12 +83,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 20,
                   width: 20,
                   child: TextButton(
-                    onPressed: _incrementCounter,
+                    onPressed: () => controlRoom(0),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
                       foregroundColor: MaterialStateProperty.all(Colors.black)
                     ),
-                    child: const Text("Divide"),
+                    child: Text(rooms[0]),
                   ),
                 ),
                 Container(
@@ -93,12 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 20,
                   width: 20,
                   child: TextButton(
-                    onPressed: _incrementCounter,
+                    onPressed: () => controlRoom(1),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
                       foregroundColor: MaterialStateProperty.all(Colors.black)
                     ),
-                    child: const Text("Add"),
+                    child: Text(rooms[1]),
                   ),
                 ),
                 Container(
@@ -107,12 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 20,
                   width: 20,
                   child: TextButton(
-                    onPressed: _incrementCounter,
+                    onPressed: () => controlRoom(2),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
                       foregroundColor: MaterialStateProperty.all(Colors.black)
                     ),
-                    child: const Text("Subtract"),
+                    child: Text(rooms[2]),
                   ),
                 ),
                 Container(
@@ -121,24 +125,24 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 20,
                   width: 20,
                   child: TextButton(
-                    onPressed: _incrementCounter,
+                    onPressed: () => controlRoom(3),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
                       foregroundColor: MaterialStateProperty.all(Colors.black)
                     ),
-                    child: const Text("Multiply"),
+                    child: Text(rooms[3]),
                   ),
                 ),
               ],
             ),
           ),
         ]
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      ),)
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }

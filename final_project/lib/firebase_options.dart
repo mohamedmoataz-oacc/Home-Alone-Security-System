@@ -17,14 +17,19 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 
-Future<File> get _localFile async {
+Future<File> get _localFileWeb async {
   return File('../api.txt');
 }
+Future<File> get _localFileAndroid async {
+  return File('../api2.txt');
+}
 
-Future<String> readAPI(int timeout) async {
+Future<String> readAPI(int timeout, bool web) async {
   if (timeout == 0) return "";
   try {
-    final file = await _localFile;
+    final File file;
+    if (web) {file = await _localFileWeb;}
+    else {file = await _localFileAndroid;}
 
     // Read the file
     final contents = await file.readAsString();
@@ -32,10 +37,11 @@ Future<String> readAPI(int timeout) async {
     return contents;
   } catch (e) {
     // If encountering an error, return 0
-    return readAPI(timeout-1);
+    return readAPI(timeout-1, true);
   }
 }
-var api = readAPI(10).toString();
+var api = readAPI(10, true).toString();
+var api2 = readAPI(10, false).toString();
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -72,7 +78,7 @@ class DefaultFirebaseOptions {
   );
 
   static FirebaseOptions android = FirebaseOptions(
-    apiKey: api,
+    apiKey: api2,
     appId: '1:398220662642:android:aa1153b92f5aa303082feb',
     messagingSenderId: '398220662642',
     projectId: 'iot-training-final-project',
