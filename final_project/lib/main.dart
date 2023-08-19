@@ -47,8 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
     else if (room_name[room_name.length - 1] == "f") isOn = false;
 
     setState(() {
-      if (isOn) rooms[room_num] = "Entrance: Off";
-      else rooms[room_num] = "Entrance: On";
+      if (isOn) rooms[room_num] = room_name.substring(0,room_name.length - 2) + "Off";
+      else rooms[room_num] = room_name.substring(0,room_name.length - 3) + "On";
     });
   }
 
