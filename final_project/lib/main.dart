@@ -143,6 +143,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // List of containers containing the buttons that contol the rooms
+    List<Widget> grid_containers = [];
+    for (int i = 0; i < 4; i++) {
+      grid_containers.add(
+        Container(
+          padding: const EdgeInsets.all(8),
+          color: Colors.white,
+          height: 20,
+          width: 20,
+          child: TextButton(
+            onPressed: () => controlRoom(0),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
+              foregroundColor: MaterialStateProperty.all(Colors.black)
+            ),
+            child: Text(rooms[i]),
+          ),
+        )
+      );
+    }
+
+    // List of all widgets in the column, which are the 4 Text notifications
+    // and the grid containing the buttons
     List<Widget> column_list = [
       if (kIsWeb) Expanded(
         child: GridView.count(
@@ -152,64 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
           crossAxisCount: 2,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.white,
-              height: 20,
-              width: 20,
-              child: TextButton(
-                onPressed: () => controlRoom(0),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
-                  foregroundColor: MaterialStateProperty.all(Colors.black)
-                ),
-                child: Text(rooms[0]),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.white,
-              height: 20,
-              width: 20,
-              child: TextButton(
-                onPressed: () => controlRoom(1),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
-                  foregroundColor: MaterialStateProperty.all(Colors.black)
-                ),
-                child: Text(rooms[1]),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.white,
-              height: 20,
-              width: 20,
-              child: TextButton(
-                onPressed: () => controlRoom(2),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
-                  foregroundColor: MaterialStateProperty.all(Colors.black)
-                ),
-                child: Text(rooms[2]),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              color: Colors.white,
-              height: 20,
-              width: 20,
-              child: TextButton(
-                onPressed: () => controlRoom(3),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
-                  foregroundColor: MaterialStateProperty.all(Colors.black)
-                ),
-                child: Text(rooms[3]),
-              ),
-            ),
-          ],
+          children: grid_containers
         ),
       ),
     ];
@@ -225,7 +191,8 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    monitorSensors();
+    monitorSensors();  // Call the function that monitors the sensors and display notifications
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
