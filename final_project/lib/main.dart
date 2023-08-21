@@ -96,6 +96,9 @@ class _MyHomePageState extends State<MyHomePage> {
       var sensorsValues = Map<String, int>.from(value["sensors"] as Map);
       actuatorsValues = Map<String, String>.from(value["actuators"] as Map);
 			setMessages(sensorsValues, actuatorsValues);
+
+      if (actuatorsValues["Buzzer"]! == "0" && rooms[0][rooms[0].length - 1] == "n") controlRoom(0);
+      if (actuatorsValues["DC"]! == "0" && rooms[3][rooms[3].length - 1] == "n") controlRoom(3);
 			
       last[0] = sensorsValues["IR"]!;
       last[1] = sensorsValues["PIR"]!;
