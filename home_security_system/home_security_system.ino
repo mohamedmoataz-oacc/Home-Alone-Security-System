@@ -29,6 +29,7 @@
 #define PIR_PIN 21
 #define LDR_PIN 20
 #define BUTTON_PIN 22
+#define LED_PIN 6
 
 char keys[ROW_NUM][COLUMN_NUM] = {
     {'1', '2', '3', 'A'},
@@ -134,8 +135,10 @@ void setup() {
 int last[] = {0,0,0,0};
 String last_buzzer = "0";
 String last_dc = "1";
+int last_button = 1;
 float duration_us, distance_cm;
 bool second_floor = false;
+int led_state = 0;
 
 void loop() {
 	digitalWrite(TRIG_PIN, HIGH);
@@ -147,10 +150,20 @@ void loop() {
 	String current_buzzer = dbReadActuator("Buzzer");
 	String current_dc = dbReadActuator("DC");
 	String current_servo = dbReadActuator("Servo");
+	int current_button = digitalRead(BUTTON_PIN);
 	int current_ir = analogRead(IR_PIN);
 	int current_pir = digitalRead(PIR_PIN);
 	int current_us = distance_cm;
 	int current_ldr = analogRead(LDR_PIN);
+
+	Serial.print("IR: ");
+	Serial.println(current_ir);
+	Serial.print("PIR: ");
+	Serial.println(current_pir);
+	Serial.print("LDR: ");
+	Serial.println(current_ldr);
+	Serial.print("US: ");
+	Serial.println(current_us);
 
 	dbUpdate("IR", current_ir, false);
 	dbUpdate("PIR", current_pir, false);
@@ -210,6 +223,10 @@ void loop() {
 	}
 
 	// Room 1 security system
+	if (current_button == 0 && last_button == 1) {
+		led_state = (led_state + 1) % 2;
+		digitalWrite(LED_PIN, led_state);
+	}
 	if (current_ldr > 1000 && last[2] < 1000) {
 		second_floor = true;
 		if (current_servo[0] == "1") {
@@ -231,6 +248,7 @@ void loop() {
 
 	last_buzzer = current_buzzer;
 	last_dc = current_dc;
+	last_button = current_button;
 	last[0] = current_ir;
 	last[1] = current_pir;
 	last[2] = current_ldr;
