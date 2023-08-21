@@ -1,5 +1,6 @@
 # Home-Alone-Security-System
-A minimized IOT based security system inspired from the movie Home Alone
+<img src="https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg" alt="Awesome Badge"/> [![GitHub Anmol](https://img.shields.io/github/followers/mohamedmoataz-oacc?label=follow&style=social)](https://github.com/mohamedmoataz-oacc)
+<br><br>A minimized IOT based security system inspired from the movie Home Alone
 
 Our project idea was inspired from the movie "Home Alone", where a kid is left alone in a house and some thieves try to break into the house, so he hides some pranks all over the house to beat those thieves.
 We are doing the same! We are going to build a house that has some sensors and actuators in each room. Whenever a sensor senses presence in a room, it activates the actuator to prank the thieves and eventually kick them out of the house.
