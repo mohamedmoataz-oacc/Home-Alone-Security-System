@@ -133,12 +133,13 @@ void setup() {
 }
 
 int last[] = {0,0,0,0};
+int last_button = 1;
+int led_state = 0;
 String last_buzzer = "0";
 String last_dc = "1";
-int last_button = 1;
 float duration_us, distance_cm;
 bool second_floor = false;
-int led_state = 0;
+bool rope = false;
 
 void loop() {
 	digitalWrite(TRIG_PIN, HIGH);
@@ -206,12 +207,13 @@ void loop() {
 	}
 
 	// Ladder security system
-	if (last_dc == "0" && current_dc == "1") {
+	if (last_dc == "0" && current_dc == "1" && rope) {
 		digitalWrite(PIN_IN1, LOW);
 		digitalWrite(PIN_IN2, HIGH);
 		analogWrite(PIN_ENA, 50);
 		delay(500);
 		digitalWrite(PIN_IN2, LOW);
+		rope = false;
 	}
 	if (current_pir == 1 && last[1] == 0 && second_floor && current_dc == "1") {
 		digitalWrite(PIN_IN1, HIGH);
@@ -220,6 +222,7 @@ void loop() {
 		delay(500);
 		digitalWrite(PIN_IN1, LOW);
 		dbUpdate("DC", 0, true);
+		rope = true;
 	}
 
 	// Room 1 security system
