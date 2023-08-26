@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Homa Alone Security System',
+      title: 'Home Alone Security System',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 4, 217, 114)),
         useMaterial3: true,
@@ -39,22 +39,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> data = ["", "", "", ""]; // Contains 4 strings because we show 4 notifications on screen
-  int turn = 0;
+  int notifications_in_screen = 6;
+  List<String> data = [];
   List<int> last = [0,0,0,0];
 
   void setMessages(Map<String, int> sensorsValues, Map<String, String> actuatorsValues) {
 
     void insertToData(String message) {
-      if (turn < 4) {
-        data[turn] = message;
-        turn++;
-      } else {
-        for (int i = 0; i < 3; i++) {
-          data[i] = data[i + 1];
-        }
-        data[3] = message;
+      for (int i = 0; i < notifications_in_screen-1; i++) {
+        data[i] = data[i + 1];
       }
+      data[notifications_in_screen-1] = message;
     }
 
     if (sensorsValues["IR"]! < 1000 && last[0] > 1000) {
@@ -148,6 +143,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Adding notification placeholders to the list of notifications
+    for (int i = 0; i < notifications_in_screen; i++) {
+      data.add("");
+    }
     // List of containers containing the buttons that contol the rooms
     List<Widget> grid_containers = [];
     for (int i = 0; i < 4; i++) {
@@ -175,6 +174,12 @@ class _MyHomePageState extends State<MyHomePage> {
     // List of all widgets in the column, which are the 4 Text notifications
     // and the grid containing the buttons
     List<Widget> column_list = [
+      SizedBox(
+        height: 20,
+      ),
+      SizedBox(
+        height: 50,
+      ),
       if (kIsWeb) Expanded(
         child: GridView.count(
           primary: true,
@@ -187,8 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     ];
-    for (int i = 3; i >= 0; i--) {
-      column_list.insert(0,
+    for (int i = notifications_in_screen-1; i >= 0; i--) {
+      column_list.insert(1,
         Text(
           data[i],
           style: const TextStyle(

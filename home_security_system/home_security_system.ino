@@ -199,7 +199,8 @@ void loop() {
 				delay(1000);
 			}
 		}
-	}
+	} else digitalWrite(BUZZER_PIN, LOW);
+	
 	if (((current_ir < 1000 && last[0] > 1000) || wrong_password_counter >= 3) && current_buzzer == "1") {
 		digitalWrite(BUZZER_PIN, HIGH);
 		lcd.clear();
