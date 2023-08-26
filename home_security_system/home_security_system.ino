@@ -1,4 +1,3 @@
-
 #include <Keypad.h>
 #include <ESP32Servo.h>
 #include <LiquidCrystal.h>
@@ -53,6 +52,7 @@ FirebaseConfig config;
 char key = keypad.getKey();
 String password = "";
 String t_pass = "A001*4";
+int wrong_password_counter = 0;
 
 // int dbReadSensor(String data_field) {
 //     if (Firebase.getInt(fbdo, "/sensors/" + data_field)) return fbdo.to<int>();
@@ -189,16 +189,18 @@ void loop() {
 				lcd.clear();
 				lcd.print("Welcome home!");
 				dbUpdate("Buzzer", 0, true);
+				digitalWrite(BUZZER_PIN, LOW);
 			} else {
 				lcd.clear();
 				lcd.print("Wrong pin!");
 				password = "";
+				wrong_password_counter++;
 				last_buzzer = "0";
 				delay(1000);
 			}
 		}
 	}
-	if (current_ir < 1000 && last[0] > 1000 && current_buzzer == "1") {
+	if (((current_ir < 1000 && last[0] > 1000) || wrong_password_counter >= 3) && current_buzzer == "1") {
 		digitalWrite(BUZZER_PIN, HIGH);
 		lcd.clear();
 		lcd.print("Someone broke");
@@ -223,6 +225,7 @@ void loop() {
 		digitalWrite(PIN_IN1, LOW);
 		dbUpdate("DC", 0, true);
 		rope = true;
+		second_floor = false;
 	}
 
 	// Room 1 security system

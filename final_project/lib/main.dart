@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
         insertToData("Buzzer activated!");
       }
     }
-    if (sensorsValues["PIR"]! < 1000 && last[1] > 1000) {
+    if (sensorsValues["PIR"]! == 1 && last[1] == 0) {
       insertToData("Somebody is near the ladder");
       if (actuatorsValues["DC"]! == "1") {
         insertToData("DC motor activated!");
@@ -98,6 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
 			setMessages(sensorsValues, actuatorsValues);
 
       if (actuatorsValues["Buzzer"]! == "0" && rooms[0][rooms[0].length - 1] == "n") controlRoom(0);
+      if (actuatorsValues["Servo"]![0] == "0" && rooms[1][rooms[1].length - 1] == "n") controlRoom(1);
+      if (actuatorsValues["Servo"]![1] == "0" && rooms[2][rooms[2].length - 1] == "n") controlRoom(2);
       if (actuatorsValues["DC"]! == "0" && rooms[3][rooms[3].length - 1] == "n") controlRoom(3);
 			
       last[0] = sensorsValues["IR"]!;
@@ -156,9 +158,12 @@ class _MyHomePageState extends State<MyHomePage> {
           height: 20,
           width: 20,
           child: TextButton(
-            onPressed: () => controlRoom(0),
+            onPressed: () => controlRoom(i),
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 54, 155, 244)),
+              backgroundColor:
+                MaterialStateProperty.all(
+                  rooms[i][rooms[i].length - 1] == 'n'? const Color.fromARGB(255, 54, 155, 244) : Colors.red
+                ),
               foregroundColor: MaterialStateProperty.all(Colors.black)
             ),
             child: Text(rooms[i]),
