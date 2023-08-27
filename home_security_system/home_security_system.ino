@@ -8,8 +8,8 @@
 #define FIREBASE_HOST "https://iot-training-final-project-default-rtdb.europe-west1.firebasedatabase.app"
 #define FIREBASE_AUTH "AIzaSyDFtgk-FysXe3GTWVwTRvGILe9bBxRO8-A"
 
-#define WIFI_SSID "MO"
-#define WIFI_PASSWORD "m4m05909"
+#define WIFI_SSID "Mohamed"
+#define WIFI_PASSWORD "s4424Z70"
 
 #define USER_EMAIL "cooladmin@oursecurehome.com"
 #define USER_PASSWORD "v3rys3cur3p@$$w0rd"
@@ -17,29 +17,29 @@
 #define ROW_NUM    4
 #define COLUMN_NUM    4
 
-#define PIN_IN1 7
-#define PIN_IN2 8
-#define PIN_ENA 9
-#define BUZZER_PIN 5
+#define PIN_IN1 5
+#define PIN_IN2 17
+#define PIN_ENA 18
+#define BUZZER_PIN 15
 #define SERVO_PIN 4
 #define IR_PIN 35
-#define TRIG_PIN 24
-#define ECHO_PIN 34
-#define PIR_PIN 21
-#define LDR_PIN 20
-#define BUTTON_PIN 22
-#define LED_PIN 6
+#define TRIG_PIN 25
+#define ECHO_PIN 32
+#define PIR_PIN 33
+#define LDR_PIN 34
+#define BUTTON_PIN 16
+#define LED_PIN 2
 
 char keys[ROW_NUM][COLUMN_NUM] = {
     {'1', '2', '3', 'A'},
     {'4', '5', '6', 'B'},
     {'7', '8', '9', 'C'},
-    {'*', '0', '#', 'D'}
+    {'*', '0', '#', 'D'},
 };
 
-byte pin_rows[ROW_NUM] = {13,12,14,27};
-byte pin_column[COLUMN_NUM] = {26,25,33,32};
-LiquidCrystal lcd(19, 23, 18, 17, 16, 15);
+byte pin_rows[ROW_NUM] = {26,27};
+byte pin_column[COLUMN_NUM] = {14,12,13};
+LiquidCrystal lcd(22, 23, 1, 3, 21, 19);
 
 Keypad keypad = Keypad(makeKeymap(keys), pin_rows, pin_column, ROW_NUM, COLUMN_NUM);
 Servo servo;
@@ -49,19 +49,10 @@ FirebaseJson json;
 FirebaseAuth auth;
 FirebaseConfig config;
 
-char key = keypad.getKey();
+char key;
 String password = "";
-String t_pass = "A001*4";
+String t_pass = "225632";
 int wrong_password_counter = 0;
-
-// int dbReadSensor(String data_field) {
-//     if (Firebase.getInt(fbdo, "/sensors/" + data_field)) return fbdo.to<int>();
-//     else {
-//         Serial.print("Error reading from Firebase: ");
-//         Serial.println(fbdo.errorReason());
-//     }
-//     return 0;
-// }
 
 String dbReadActuator(String data_field) {
     if (Firebase.getString(fbdo, "/actuators/" + data_field)) return fbdo.to<String>();
@@ -93,6 +84,45 @@ void dbUpdate(String data_field, int newValue, bool act) {
     }
 }
 
+TaskHandle_t Task1;
+bool buzzer_turned_on = true;
+bool dc_turned_on = false;
+String last_buzzer = "0";
+String last_dc = "1";
+String current_buzzer;
+String current_dc;
+String current_servo;
+
+int current_ir = 4095;
+int current_pir = 0;
+int current_us = 0;
+int current_ldr = 20;
+
+void Task1code( void * pvParameters ){
+	Serial.print("Actuators are read on core ");
+	Serial.println(xPortGetCoreID());
+
+	for(;;){
+		current_buzzer = dbReadActuator("Buzzer");
+		current_dc = dbReadActuator("DC");
+		current_servo = dbReadActuator("Servo");
+
+		if (current_buzzer == "1"  && last_buzzer == "0") buzzer_turned_on = true;
+		else if (current_buzzer == "0"  && last_buzzer == "1") buzzer_turned_on = false;
+
+		if (current_dc == "1"  && last_dc == "0") dc_turned_on = true;
+		else if (current_dc == "0"  && last_dc == "1") dc_turned_on = false;
+
+		dbUpdate("IR", current_ir, false);
+		dbUpdate("PIR", current_pir, false);
+		dbUpdate("LDR", current_ldr, false);
+		dbUpdate("US", current_us, false);
+
+		last_buzzer = current_buzzer;
+		last_dc = current_dc;
+	}
+}
+
 void setup() {
     Serial.begin(115200);
     lcd.begin(16, 2);
@@ -101,6 +131,12 @@ void setup() {
     pinMode(ECHO_PIN, INPUT);
     pinMode(LDR_PIN, INPUT);
     pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(LED_PIN, OUTPUT);
+    pinMode(TRIG_PIN, OUTPUT);
+    pinMode(BUZZER_PIN, OUTPUT);
+    pinMode(PIN_IN1, OUTPUT);
+    pinMode(PIN_IN2, OUTPUT);
+    pinMode(PIN_ENA, OUTPUT);
     servo.attach(SERVO_PIN);
 
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -129,33 +165,39 @@ void setup() {
     Serial.println("------------------------------------");
     Serial.println("Connected...");
 
+	xTaskCreatePinnedToCore(
+		Task1code, /* Task function. */
+		"Task1",   /* name of task. */
+		10000,     /* Stack size of task */
+		NULL,      /* parameter of the task */
+		1,         /* priority of the task */
+		&Task1,    /* Task handle to keep track of created task */
+		0		   /* pin task to core 0 */
+	);
+
     servo.write(90);
 }
 
 int last[] = {0,0,0,0};
 int last_button = 1;
 int led_state = 0;
-String last_buzzer = "0";
-String last_dc = "1";
 float duration_us, distance_cm;
 bool second_floor = false;
 bool rope = false;
 
 void loop() {
+    key = keypad.getKey();
 	digitalWrite(TRIG_PIN, HIGH);
 	delayMicroseconds(10);
 	digitalWrite(TRIG_PIN, LOW);
 	duration_us = pulseIn(ECHO_PIN, HIGH);
 	distance_cm = 0.017 * duration_us;
 
-	String current_buzzer = dbReadActuator("Buzzer");
-	String current_dc = dbReadActuator("DC");
-	String current_servo = dbReadActuator("Servo");
 	int current_button = digitalRead(BUTTON_PIN);
-	int current_ir = analogRead(IR_PIN);
-	int current_pir = digitalRead(PIR_PIN);
-	int current_us = distance_cm;
-	int current_ldr = analogRead(LDR_PIN);
+	current_ir = analogRead(IR_PIN);
+	current_pir = digitalRead(PIR_PIN);
+	current_us = distance_cm;
+	current_ldr = analogRead(LDR_PIN);
 
 	Serial.print("IR: ");
 	Serial.println(current_ir);
@@ -166,24 +208,19 @@ void loop() {
 	Serial.print("US: ");
 	Serial.println(current_us);
 
-	dbUpdate("IR", current_ir, false);
-	dbUpdate("PIR", current_pir, false);
-	dbUpdate("US", current_us, false);
-	dbUpdate("LDR", current_ldr, false);
-
 	// Entrance security system
-    if (current_buzzer == "1" && last_buzzer == "0") {
+    if (buzzer_turned_on) {
+		buzzer_turned_on = false;
 		lcd.clear();
-        lcd.print("Enter 6 digit");
-        lcd.setCursor(0, 1);
-        lcd.print("pin code: ");
+		lcd.print("Enter 6 digit");
+		lcd.setCursor(0, 1);
+		lcd.print("pin code: ");
 	} else if (current_buzzer == "1") {
-		key = keypad.getKey();
-		if (key && password.length < 6) {
+		if (key && password.length() < 6) {
 			password += key;
 			lcd.print(key);
 		}
-		if (password.length == 6) {
+		if (password.length() == 6) {
 			second_floor = false;
 			if (password == t_pass) {
 				lcd.clear();
@@ -199,7 +236,7 @@ void loop() {
 				delay(1000);
 			}
 		}
-	} else digitalWrite(BUZZER_PIN, LOW);
+	} else if (current_buzzer == "0") digitalWrite(BUZZER_PIN, LOW);
 	
 	if (((current_ir < 1000 && last[0] > 1000) || wrong_password_counter >= 3) && current_buzzer == "1") {
 		digitalWrite(BUZZER_PIN, HIGH);
@@ -209,13 +246,14 @@ void loop() {
 		lcd.print("into the house!");
 	}
 
-	// Ladder security system
-	if (last_dc == "0" && current_dc == "1" && rope) {
+	// Stairs security system
+	if (dc_turned_on && rope) {
 		digitalWrite(PIN_IN1, LOW);
 		digitalWrite(PIN_IN2, HIGH);
 		analogWrite(PIN_ENA, 50);
 		delay(500);
 		digitalWrite(PIN_IN2, LOW);
+		dc_turned_on = false;
 		rope = false;
 	}
 	if (current_pir == 1 && last[1] == 0 && second_floor && current_dc == "1") {
@@ -224,7 +262,7 @@ void loop() {
 		analogWrite(PIN_ENA, 100);
 		delay(500);
 		digitalWrite(PIN_IN1, LOW);
-		dbUpdate("DC", 0, true);
+		dc_turned_on = true;
 		rope = true;
 		second_floor = false;
 	}
@@ -233,28 +271,39 @@ void loop() {
 	if (current_button == 0 && last_button == 1) {
 		led_state = (led_state + 1) % 2;
 		digitalWrite(LED_PIN, led_state);
+		delay(500);
 	}
 	if (current_ldr > 1000 && last[2] < 1000) {
 		second_floor = true;
-		if (current_servo[0] == "1") {
-			servo.write(180);
-			delay(2000);
-			servo.write(90);
+		if (current_servo[0] == '1') {
+			for (int i = 90; i < 180; i++) {
+				servo.write(i);
+				delay(15);
+			}
+			delay(1000);
+			for (int i = 180; i > 90; i--) {
+				servo.write(i);
+				delay(15);
+			}
 		}
 	}
 
 	// Room 2 security system
 	if (current_us < 10 && last[3] > 10) {
 		second_floor = true;
-		if (current_servo[1] == "1") {
-			servo.write(0);
-			delay(2000);
-			servo.write(90);
+		if (current_servo[1] == '1') {
+			for (int i = 90; i > 0; i--) {
+				servo.write(i);
+				delay(15);
+			}
+			delay(1000);
+			for (int i = 0; i < 90; i++) {
+				servo.write(i);
+				delay(15);
+			}
 		}
 	}
 
-	last_buzzer = current_buzzer;
-	last_dc = current_dc;
 	last_button = current_button;
 	last[0] = current_ir;
 	last[1] = current_pir;
