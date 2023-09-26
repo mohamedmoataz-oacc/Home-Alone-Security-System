@@ -5,14 +5,14 @@
 #include <time.h>
 #include <FirebaseESP32.h>
 
-#define FIREBASE_HOST "https://iot-training-final-project-default-rtdb.europe-west1.firebasedatabase.app"
-#define FIREBASE_AUTH "AIzaSyDFtgk-FysXe3GTWVwTRvGILe9bBxRO8-A"
+#define FIREBASE_HOST // YOUR DB LINK GOES HERE
+#define FIREBASE_AUTH // YOUR API KEY GOES HERE
 
-#define WIFI_SSID "Galaxy A70"
-#define WIFI_PASSWORD "@N01210A"
+#define WIFI_SSID // YOUR WIFI GOES HERE
+#define WIFI_PASSWORD // YOUR WIFI PASSWORD GOES HERE
 
-#define USER_EMAIL "cooladmin@oursecurehome.com"
-#define USER_PASSWORD "v3rys3cur3p@$$w0rd"
+#define USER_EMAIL // YOUR USER EMAIL GOES HERE
+#define USER_PASSWORD // YOUR USER PASSWORD GOES HERE
 
 #define ROW_NUM    2
 #define COLUMN_NUM    3
